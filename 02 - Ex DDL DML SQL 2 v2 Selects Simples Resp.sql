@@ -1,6 +1,6 @@
-CREATE DATABASE sql_ddl_dml_2_v2
+CREATE DATABASE sql_ddl_dml_2_v3
 GO
-USE sql_ddl_dml_2_v2 
+USE sql_ddl_dml_2_v3
 GO
 CREATE TABLE cliente(
 num_cadastro	INT				NOT NULL,
@@ -231,3 +231,25 @@ WHERE num_cadastro IN
 	FROM locacao
 	WHERE dvdnum = 10002
 )
+
+SELECT cl.num_cadastro, cl.nome, CONVERT(CHAR(10), lo.data_locacao, 103) AS data_locaçao,
+DATEDIFF(DAY, lo.data_locacao, lo.data_devolucao) AS qtdade_dias_alugados, fi.titulo, fi.ano
+FROM cliente cl, locacao lo, filme fi, dvd
+WHERE cl.num_cadastro = lo.clientenum_cadastro
+	AND dvd.filmeid = fi.id
+	AND dvd.num = lo.dvdnum
+	AND nome LIKE 'Matilde%'
+
+SELECT es.nome, es.nome_real, fi.titulo 
+FROM estrela es, filme fi, filme_estrela fe
+WHERE es.id = fe.estrelaid
+	AND fi.id = fe.filmeid
+	AND fi.ano = 2015
+
+SELECT fi.titulo, CONVERT(CHAR(10), dvd.data_fabricacao, 103) AS data_fabricaçao,
+CASE WHEN DATEDIFF(YEAR, fi.ano, GETDATE()) < 6
+THEN DATEDIFF(YEAR, fi.ano, GETDATE()) + 'Anos'
+ELSE DATEDIFF(YEAR, fi.ano, GETDATE())
+END AS diferenca_anos
+FROM filme fi, dvd
+WHERE fi.id = dvd.filmeid
