@@ -1,6 +1,6 @@
-create database novo_exercicio_projeto
+create database novo_exercicio_projeto_2
 go
-use novo_exercicio_projeto
+use novo_exercicio_projeto_2
 go
 
 create table users(
@@ -78,3 +78,19 @@ where project_id = 10003)
 select name, description, convert(char(10), date, 103) as start_date, '16/09/2014' as final_date, 
 datediff(day, date, '2014-09-16') * 79.85 as custo_total 
 from project where id = 10002
+
+select u.id, u.name, u.email, p.id, p.name, p.description, p.date
+from users u, project p, users_has_projects up
+where u.id = up.users_id
+	and p.id = up.project_id
+	and p.name like 'Re-folha'
+
+select p.name 
+from project p left outer join users_has_projects up
+on p.id = up.project_id
+where p.id is null
+
+select u.name
+from users u left outer join users_has_projects up
+on u.id = up.users_id
+where up.users_id is null
