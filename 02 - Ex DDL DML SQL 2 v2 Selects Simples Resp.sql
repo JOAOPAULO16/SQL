@@ -253,3 +253,41 @@ ELSE DATEDIFF(YEAR, fi.ano, GETDATE())
 END AS diferenca_anos
 FROM filme fi, dvd
 WHERE fi.id = dvd.filmeid
+
+SELECT cl.num_cadastro, cl.nome, fi.id, dvd.data_fabricacao, lo.valor
+FROM cliente cl, filme fi, dvd, locacao lo
+WHERE cl.num_cadastro = lo.clientenum_cadastro
+	AND dvd.filmeid = fi.id
+	AND dvd.num = lo.dvdnum
+	AND dvd.data_fabricacao IN
+	(
+		SELECT MAX(dvd.data_fabricacao)
+		FROM dvd
+	)
+ORDER BY dvd.data_fabricacao
+
+SELECT cl.num_cadastro, cl.nome, CONVERT(VARCHAR(10), lo.data_locacao, 103) AS dt_locacao, COUNT(lo.dvdnum) AS qtd_dvd_alugado
+FROM cliente cl, locacao lo
+WHERE cl.num_cadastro = lo.clientenum_cadastro
+GROUP BY lo.data_locacao, cl.nome, cl.num_cadastro
+
+SELECT cl.num_cadastro, cl.nome, CONVERT(VARCHAR(10), lo.data_locacao, 103) AS dt_locacao, SUM(valor) AS valor_total
+FROM cliente cl, locacao lo
+WHERE cl.num_cadastro = lo.clientenum_cadastro
+GROUP BY lo.data_locacao, cl.nome, cl.num_cadastro
+
+SELECT cl.num_cadastro, cl.nome, cl.logradouro + ', ' + CAST(cl.num AS VARCHAR) AS endereço, 
+	CONVERT(VARCHAR(10), lo.data_locacao, 103) AS dt_locaçao
+FROM cliente cl, locacao lo
+WHERE cl.num_cadastro = lo.clientenum_cadastro
+	AND lo.clientenum_cadastro IN
+		(
+			SELECT cl.num_cadastro
+			FROM cliente cl, locacao lo, dvd, filme fi
+			WHERE cl.num_cadastro = lo.clientenum_cadastro
+				AND dvd.num = lo.dvdnum
+				AND dvd.filmeid = fi.id
+			GROUP BY cl.num_cadastro, lo.dvdnum
+			HAVING SUM(dvd.filmeid) >= 2
+		)
+GROUP BY lo.data_locacao, cl.num_cadastro, cl.nome, cl.logradouro, cl.num
