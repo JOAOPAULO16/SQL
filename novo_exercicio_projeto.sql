@@ -94,3 +94,20 @@ select u.name
 from users u left outer join users_has_projects up
 on u.id = up.users_id
 where up.users_id is null
+
+insert into users values ('Joao', 'Ti_joao', '123mudar', 'joao@empresa.com')
+
+insert into project values ('Atualização de Sistemas', 'Modificação de Sistemas Operacionais', '2014-09-12')
+
+select count(p.name) qty_projects_no_users
+from project p left outer join users_has_projects up
+on p.id = up.project_id
+where up.project_id is null
+group by p.name
+
+select p.id, p.name, count(up.users_id) as qty_users_project
+from project p, users_has_projects up, users u
+where p.id = up.project_id
+	and u.id = up.users_id
+group by p.id, p.name
+order by p.name asc
